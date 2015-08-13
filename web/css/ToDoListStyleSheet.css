@@ -1,6 +1,5 @@
 
 body{
-    overflow-x: hidden;
 }
 .header {
     overflow: auto;
@@ -33,9 +32,9 @@ body{
 }
 .toDoListContainerOuter {
     width: 100%;
-    overflow: hidden;
 }
 .toDoListContainerInner {
+    overflow: auto;
     width : 100%;
     height: 70%;
 }
@@ -49,7 +48,6 @@ body{
     left: 0;
 }
 .inputTextOuter {
-    overflow: inherit;
     position: relative;
     width: 100%;
     padding-top: 10px;
@@ -60,6 +58,7 @@ body{
     right:0;
     margin-left:auto;
     margin-right:auto;
+    padding-bottom: 10px;
 }
 .listEmptyMessage {
     text-align: center;
@@ -82,24 +81,31 @@ body{
 .checkboxStyle{
     width : 10%;
 }
-.styledCheckbox{
-    -webkit-transform: scale(2); /* Safari and Chrome */
+.checkboxSize{
+    cursor: pointer;
+    width: 18px;
+    height : 18px;
 }
-.remainderButtonStyle{
+.remainderButtonStyle {
+    cursor: pointer;
+    font-size: 20px;
     margin-left: 5%;
 }
 .panelSlide{
     padding: 5px;
-    overflow: auto;
     text-align: center;
     border: solid 1px;
     display : none;
 }
 .timerStyle {
-    overflow: auto;
     padding: 5px;
     margin-left: 40%;
 }
 .alertMessage {
     display: none;
+}
+.timerButtons{
+    overflow: auto;
+    padding: 5px;
+    margin-left: 40%;
 }
