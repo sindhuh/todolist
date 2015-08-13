@@ -53,8 +53,7 @@ var timerFunction = function (inputDate , id ) {
         displaytime.text("time left : " +diffhours+ "hrs");
     }
     else if(diffhours < 1 && diffminutes > 5){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffminutes+ "mins");
+
     }
     else if(diffminutes < 5){
         displaytime.css("display" , "block");
