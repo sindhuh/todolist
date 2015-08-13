@@ -50,11 +50,10 @@
 <%if (isListEmpty) {%>
 <div id="emptyListMessage" class="listEmptyMessage">Your To Do List is empty</div>
 <%}%>
-<div class="alert alert-success " style="display: none" id="alertMessage">
-    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-    <strong>Success!</strong> This alert box could indicate a successful or positive action.
-</div>
-<div class="toDoListContainerOuter">
+            <p>Time icon: <span class="glyphicon glyphicon-time"></span></p>
+
+
+            <div class="toDoListContainerOuter">
     <div id="listContainer" class="toDoListContainerInner">
         <div id="listBody" class="toDoListStyle">
             <%
@@ -63,10 +62,11 @@
             <div id="listItemId-<%= item.ID %>" class="toDoListDataStyle">
                 <span id="item-<%= item.ID %>" class="itemStyle " contenteditable="true"><%= item.message %>
                 </span>
-                <span class="checkboxStyle checkbox-primary" id="checkboxId-<%= item.ID %>"><input style="height: 24px;width: 24px"
+                <span class="checkboxStyle checkbox-primary" id="checkboxId-<%= item.ID %>"><input class="checkboxSize"
                                                                                   type="checkbox"/></span>
-                <span id="remainderButton-<%= item.ID %>" class="button btn btn-default btn-sm remainderButtonStyle"
-                      value="Remainder">Reminder</span>
+                <span class="glyphicons glyphicons-print"></span>
+                <span id="remainderButton-<%= item.ID %>" class="remainderButtonStyle"
+                      value="Remainder"><span class="glyphicon glyphicon-time"></span></span>
             </div>
             <div id="panel-<%= item.ID %>" class="panelSlide">
                 Enter time in 24 hours format:
