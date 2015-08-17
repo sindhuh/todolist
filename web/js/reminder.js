@@ -13,51 +13,79 @@ var reminderFunction = function (id) {
             if (!dateAndTime.trim()) {
                 return;
             }
-            else{
-                var reminderTime = dateAndTime.replace(/[/ :\s]/g, ",").split(",");
-                var month = reminderTime[0];
-                var day = reminderTime[1];
-                var year = reminderTime[2];
-                var hours = reminderTime[3];
-                var mins = reminderTime[4];
-                var amOrPm = reminderTime[5];
-                if(amOrPm == "PM" && hours < 12){
-                    hours = parseInt(hours) + 12;
-                }
-                var userEnteredDate = new Date(parseInt(year),parseInt(month-1),parseInt(day),parseInt(hours),parseInt(mins), 0);
+            else {
+                $.ajax({
+                    url : "timer.jsp",
+                    data : {
+                        timeDuration : dateAndTime,
+                        id : idAfterSplit,
+                    },
+                    method : "POST"
+                }).done(function () {
+                }).fail(function () {
+                });
+                getUserTimeData(dateAndTime , idAfterSplit)
             }
-                timerFunction(userEnteredDate, idAfterSplit)
         })
     })
 }
-var timerFunction = function (inputDate , id ) {
-    var displaytime = $("#displayTimeId-" +id);
-    var reminderIcon = $("#remainderButton-" +id)
+var getUserTimeData = function(dateAndTime , id){
+    var userEnteredDate = moment(dateAndTime , "MM-DD-YYYY HH:mm a A").toDate();
+    console.log("userentereddate : " +userEnteredDate);
     var presentDate = new Date();
-    var differenceTravel = inputDate.getTime() - presentDate.getTime();
-    if(differenceTravel == 0){
+    var differenceTravel = userEnteredDate.getTime()-presentDate.getTime();
+    timerFunction(parseInt(differenceTravel) , id)
+    }
+var timerFunction = function (differenceTravel , id ) {
+    var displaytime = $("#displayTimeId-" + id);
+    displaytime.css("display" , "block");
+    console.log("displayTimeId : #displayTimeId-" +id);
+    var reminderIcon = $("#remainderButton-" + id);
+    console.log("remainderButton : #remainderButton-" +id);
+    if (differenceTravel <= 0) {
         return;
     }
-    var duration = moment.duration(differenceTravel , 'milliseconds');
-    var interval = 1000;
-    setInterval(function(){
-        reminderIcon.css("display" , "none")
-        duration = moment.duration(duration - interval, 'milliseconds');
-        if(duration.days() >= 1 ){
-            displaytime.text("time left : " +duration.days() +"days");
+    var timer = setInterval(function () {
+        reminderIcon.css("display", "none");
+        var lengthOfTime =moment.duration(differenceTravel ,"milliseconds" );
+        differenceTravel = differenceTravel - 1000;
+        if(lengthOfTime.minutes() >= 5){
+            displaytime.text("time left : " +lengthOfTime.humanize());
         }
-        else if(duration.hours() >= 1 && duration.days() < 1){
-            displaytime.text("time left : " +duration.hours() +"hours");
+        else if(lengthOfTime.minutes() < 5 && lengthOfTime.minutes() < 1){
+            displaytime.text("time left : " + lengthOfTime.minutes() + ":" + lengthOfTime.seconds());
         }
-        else if(duration.hours() < 1 && duration.minutes()> 5){
-            displaytime.text("time left : " +duration.minutes() +"minutes");
+        else if(lengthOfTime.minutes() == 0 && lengthOfTime.seconds() > 1) {
+            displaytime.text("time left : " +lengthOfTime.seconds());
         }
-        else if(duration.minutes() >=1 && duration.minutes() < 5) {
-            displaytime.text("time left : " + duration.minutes() + ":" + duration.seconds());
+         if (lengthOfTime.milliseconds() <= 0) {
+            clearInterval(timer);
+             reminderIcon.css("display", "block");
+             displaytime.css("display", "none");
+             bootbox.alert({
+                title: "Reminder",
+                message: "item name : " + $('#item-' + id).text(),
+            });
         }
-        else if(duration.minutes() == 0 && duration.seconds() >=  0){
-            console.log("seconds section");
-            displaytime.text("time left : " + duration.seconds() + "secs");
-        }
-    }, interval);
+    }, 1000);
+    displaytime.click(function () {
+        $("#panel-" + id).slideDown();
+        $('#cancelButton-' + id).click(function () {
+            $('#dateId-' + id).val("");
+            clearInterval(timer);
+            displaytime.text("");
+            reminderIcon.css("display", "block")
+        })
+        $("#timeSetButton-" + id).click(function () {
+            var dateAndTime = $('#dateId-' + id).val();
+            $("#panel-" + id).slideUp("slow");
+            clearInterval(timer);
+            if (!dateAndTime.trim()) {
+                return;
+            }
+            else {
+                getUserTimeData(dateAndTime, id);
+            }
+        })
+    });
 }
