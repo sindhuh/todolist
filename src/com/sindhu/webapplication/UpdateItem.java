@@ -1,8 +1,8 @@
 package com.sindhu.webapplication;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class UpdateItem {
 
@@ -13,8 +13,8 @@ public class UpdateItem {
             if (connection == null) {
                 return;
             }
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(update);
+            PreparedStatement preparedStatement = connection.prepareStatement(update);
+            preparedStatement.executeUpdate(update);
         }
         catch (SQLException sql){
             System.out.println("error in sql statement :" +sql);
