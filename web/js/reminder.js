@@ -24,52 +24,40 @@ var reminderFunction = function (id) {
                 if(amOrPm == "PM" && hours < 12){
                     hours = parseInt(hours) + 12;
                 }
-                var userEnteredDate = new Date(parseInt(year),parseInt(month-1),parseInt(day));
-                userEnteredDate.setHours(hours);
-                userEnteredDate.setMinutes(mins);
+                var userEnteredDate = new Date(parseInt(year),parseInt(month-1),parseInt(day),parseInt(hours),parseInt(mins), 0);
             }
-            setTimeout(function () {
                 timerFunction(userEnteredDate, idAfterSplit)
-            }, 1000);
         })
     })
 }
 var timerFunction = function (inputDate , id ) {
     var displaytime = $("#displayTimeId-" +id);
+    var reminderIcon = $("#remainderButton-" +id)
     var presentDate = new Date();
     var differenceTravel = inputDate.getTime() - presentDate.getTime();
-    var YearDifferenceTravel = Math.floor(differenceTravel / 1000 / 60 / 60 / 24 / 365);
-    var diffMonths = inputDate.getMonth() - presentDate.getMonth() + (12 * (inputDate.getFullYear() - presentDate.getFullYear()));
-    var diffDays = Math.floor((differenceTravel) / (1000 * 60 * 60 * 24));
-    var diffhours = Math.floor((differenceTravel) / (1000 * 60 * 60));
-    var diffminutes = Math.floor((differenceTravel) / (1000 * 60));
-    var diffseconds = Math.floor((differenceTravel) / (1000));
-    if(diffDays > 1 ){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffDays+ "days");
-    }
-    else if(diffhours >= 1 && diffDays < 1){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffhours+ "hrs");
-    }
-    else if(diffhours < 1 && diffminutes > 5){
-
-    }
-    else if(diffminutes < 5){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffminutes+ ":" +diffseconds);
-        if(diffseconds == 0){
-            displaytime.css("display" , "none");
-        }
-    }
-    if(YearDifferenceTravel == 0 && diffMonths == 0 && diffDays == 0 && diffhours == 0 && diffminutes == 0 && diffseconds == 0) {
-        bootbox.alert ({
-            title: "Reminder",
-            message: "item name : " +$('#item-'+id).text(),
-        });
+    if(differenceTravel == 0){
         return;
     }
-    setTimeout(function () {
-        timerFunction(inputDate, id)
-    }, 1000);
+    var duration = moment.duration(differenceTravel , 'milliseconds');
+    var interval = 1000;
+    setInterval(function(){
+        reminderIcon.css("display" , "none")
+        duration = moment.duration(duration - interval, 'milliseconds');
+        if(duration.days() >= 1 ){
+            displaytime.text("time left : " +duration.days() +"days");
+        }
+        else if(duration.hours() >= 1 && duration.days() < 1){
+            displaytime.text("time left : " +duration.hours() +"hours");
+        }
+        else if(duration.hours() < 1 && duration.minutes()> 5){
+            displaytime.text("time left : " +duration.minutes() +"minutes");
+        }
+        else if(duration.minutes() >=1 && duration.minutes() < 5) {
+            displaytime.text("time left : " + duration.minutes() + ":" + duration.seconds());
+        }
+        else if(duration.minutes() == 0 && duration.seconds() >=  0){
+            console.log("seconds section");
+            displaytime.text("time left : " + duration.seconds() + "secs");
+        }
+    }, interval);
 }

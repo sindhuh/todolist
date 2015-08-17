@@ -68,14 +68,14 @@
                 <span class="checkboxStyle checkbox-primary" id="checkboxId-<%= item.ID %>"><input class="checkboxSize"
                                                                                                    type="checkbox"/></span>
                 <span id="remainderButton-<%= item.ID %>" class="remainderButtonStyle"
-                      value="Remainder"><span class="glyphicon glyphicon-time"></span>
-                    <span id="displayTimeId-<%= item.ID %>" style="display : none"></span>
-                </span>
+                      value="Remainder"><span class="glyphicon glyphicon-time"></span></span>
+                    <span id="displayTimeId-<%= item.ID %>"></span>
                 </div>
                 <div id="panel-<%= item.ID %>" class="panelSlide">
                     <div class="timerStyle ">
                         <div class="col-sm-5 input-group date datetimepicker">
                             <input id="dateId-<%= item.ID %>" type="text" class="form-control"/>
+
                             <div class="input-group-addon glyphicon glyphicon-calendar"></div>
                         </div>
                     </div>
@@ -99,8 +99,7 @@
     </div>
     <script>
         $(function () {
-            $('.datetimepicker').datetimepicker({
-            });
+            $('.datetimepicker').datetimepicker({});
             $(".remainderButtonStyle").each(function () {
                 var idOfRemainder = '#' + this.id;
                 reminderFunction(idOfRemainder);
