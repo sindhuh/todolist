@@ -29,26 +29,38 @@
                 </span>
                 <span class="checkboxStyle checkbox-primary" id="checkboxId-<%= item.ID %>"><input class="checkboxSize"
                                                                                                    type="checkbox"/></span>
-                    <span style="display: none" id="remainderButton-<%= item.ID %>" class="remainderButtonStyle"
-                          value="Remainder"><span class="glyphicon glyphicon-time"></span></span>
-                <span id="displayTimeId-<%= item.ID %>" style="cursor: pointer; display: none"></span>
-            </div>
-            <div id="panel-<%= item.ID %>" class="panelSlide">
-                <div class="timerStyle ">
-                    <div class="col-sm-5 input-group date datetimepicker">
-                        <input id="dateId-<%= item.ID %>" type="text" class="form-control"/>
-
-                        <div class="input-group-addon glyphicon glyphicon-calendar"></div>
-                    </div>
-                </div>
-                <div class="timerButtons ">
-                    <div id="cancelButton-<%= item.ID %>" class="col-sm-2 btn btn-default">Cancel</div>
-                    <div id="timeSetButton-<%= item.ID %>" class="col-sm-2 btn btn-default">Done</div>
-                </div>
+                <%if (item.timer.equals("")) {%>
+                <span id="remainderButton-<%= item.ID %>" class="remainderButtonStyle"
+                      value="Remainder"><span class="glyphicon glyphicon-time"></span></span>
+                <% } else {%>
+                <span class="timeLeftMessageStyle" id="displayTimeId-<%= item.ID %>" style="cursor: pointer"></span>
+                <script> getUserTimeData("<%=item.timer %>", <%= item.ID %>);
+                </script>
+                <% } %>
             </div>
             <%
                 }
             %>
+        </div>
+        <div id="panel" class="panelSlide">
+            <div class="timerStyle ">
+                <div class="col-sm-5 input-group date datetimepicker">
+                    <input id="dateId" type="text" class="form-control"/>
+                    <div class="input-group-addon glyphicon glyphicon-calendar"></div>
+                </div>
+            </div>
+            <div class="timerButtons ">
+                <div id="cancelButton" class="col-sm-2 btn btn-default">Cancel</div>
+                <div id="timeSetButton" style="margin-left: 2%" class="col-sm-2 btn btn-default">Done</div>
+            </div>
+        </div>
+        <div id="resetPanel" class="panelSlide">
+            <div id="message"></div>
+            <div class="col-sm-5 input-group date datetimepicker">
+                <input id="dateI" type="text" class="form-control"/>
+                <div class="input-group-addon glyphicon glyphicon-calendar"></div>
+            </div>
+            <div id="editButton" class="btn btn-primary">Edit</div>
         </div>
         <div class="inputTextOuter">
             <div class="col-sm-5 inputTextInner">
@@ -60,18 +72,22 @@
 </div>
 <script>
     $(function () {
-        <%
-         for(ToDoItem item : toDoListItems){
-            if(item.timer.equals("")) { %>
-                $("#remainderButton-<%= item.ID %>").css("display", "block");
-            <% } else { %>
-                $("#displayTimeId-<%= item.ID %>").css("display", "block");
-                getUserTimeData("<%=item.timer %>" , <%= item.ID %>);
-                console.log("timer value : " + "<%=item.timer%>");
-        <%  }
-        }
-        %>
         $('.datetimepicker').datetimepicker({});
+        var timeLeftMessageFunction = function (id) {
+            $(id).click(function () {
+                var resetPanel = $("#resetPanel");
+                resetPanel.insertAfter(this);
+                var timeLeft = $(this).html();
+                $("#message").html("time remaining: " +timeLeft.split(":").pop());
+                resetPanel.slideToggle();
+                $("#editButton").click(function () {
+                })
+            })
+        };
+        $(".timeLeftMessageStyle").each(function () {
+            var idOfTimeLeftMessage = '#' + this.id;
+            timeLeftMessageFunction(idOfTimeLeftMessage);
+        });
         $(".remainderButtonStyle").each(function () {
             var idOfRemainder = '#' + this.id;
             reminderFunction(idOfRemainder);
