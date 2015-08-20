@@ -7,7 +7,7 @@ public class Users {
         try {
             String insert = "INSERT INTO User_Accounts(Username, password , First_Name, Last_Name)" +
                     "VALUES (?, ?,?,?)";
-            Connection connection = Database.getConnection();
+            Connection connection = DatabaseV2.getConnection();
             if (connection == null) {
                 return false;
             }
@@ -28,7 +28,7 @@ public class Users {
         boolean checkUser = false;
         try {
             String query = "SELECT username, password FROM User_Accounts WHERE username="+"'"+username+"'" +"AND password=" +"'"+password+"'";
-            Connection connection = Database.getConnection();
+            Connection connection = DatabaseV2.getConnection();
             if (connection == null) {
                 return false;
             }

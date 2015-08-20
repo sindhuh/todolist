@@ -1,75 +1,88 @@
-var reminderFunction = function (id) {
-    var idAfterSplit = id.split('-').pop();
-    var idOfPanel = '#panel-' + idAfterSplit;
-    $(id).click(function () {
-        $(idOfPanel).slideToggle("slow");
-        $('#cancelButton-' + idAfterSplit).click(function () {
-            $('#dateId-'+idAfterSplit).val("");
-            $(idOfPanel).slideUp("slow");
-        })
-        $("#timeSetButton-" + idAfterSplit).click(function () {
-            var dateAndTime =$('#dateId-'+idAfterSplit).val();
-            $(idOfPanel).slideUp("slow");
-            if (!dateAndTime.trim()) {
-                return;
-            }
-            else{
-                var reminderTime = dateAndTime.replace(/[/ :\s]/g, ",").split(",");
-                var month = reminderTime[0];
-                var day = reminderTime[1];
-                var year = reminderTime[2];
-                var hours = reminderTime[3];
-                var mins = reminderTime[4];
-                var amOrPm = reminderTime[5];
-                if(amOrPm == "PM" && hours < 12){
-                    hours = parseInt(hours) + 12;
-                }
-                var userEnteredDate = new Date(parseInt(year),parseInt(month-1),parseInt(day));
-                userEnteredDate.setHours(hours);
-                userEnteredDate.setMinutes(mins);
-            }
-            setTimeout(function () {
-                timerFunction(userEnteredDate, idAfterSplit)
-            }, 1000);
-        })
-    })
+var timer;
+var reminderCancelFunction = function(){
+   // console.log(" reminderCancelFunction ");
+    $('.remainderButton').css("pointer-events","auto");
+    $('#dateId').val("");
+    $("#setTimerPanel").slideUp("slow");
 }
-var timerFunction = function (inputDate , id ) {
-    var displaytime = $("#displayTimeId-" +id);
-    var presentDate = new Date();
-    var differenceTravel = inputDate.getTime() - presentDate.getTime();
-    var YearDifferenceTravel = Math.floor(differenceTravel / 1000 / 60 / 60 / 24 / 365);
-    var diffMonths = inputDate.getMonth() - presentDate.getMonth() + (12 * (inputDate.getFullYear() - presentDate.getFullYear()));
-    var diffDays = Math.floor((differenceTravel) / (1000 * 60 * 60 * 24));
-    var diffhours = Math.floor((differenceTravel) / (1000 * 60 * 60));
-    var diffminutes = Math.floor((differenceTravel) / (1000 * 60));
-    var diffseconds = Math.floor((differenceTravel) / (1000));
-    if(diffDays > 1 ){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffDays+ "days");
-    }
-    else if(diffhours >= 1 && diffDays < 1){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffhours+ "hrs");
-    }
-    else if(diffhours < 1 && diffminutes > 5){
-
-    }
-    else if(diffminutes < 5){
-        displaytime.css("display" , "block");
-        displaytime.text("time left : " +diffminutes+ ":" +diffseconds);
-        if(diffseconds == 0){
-            displaytime.css("display" , "none");
-        }
-    }
-    if(YearDifferenceTravel == 0 && diffMonths == 0 && diffDays == 0 && diffhours == 0 && diffminutes == 0 && diffseconds == 0) {
-        bootbox.alert ({
-            title: "Reminder",
-            message: "item name : " +$('#item-'+id).text(),
-        });
+var i = 0 ;
+var reminderSetFunction = function(id) {
+  //  console.log(" reminderSetFunction ");
+    $('.remainderButton').css("pointer-events","auto");
+    var dateAndTime = $("#dateId").val();
+    $("#setTimerPanel").slideUp("slow");
+    if (!dateAndTime.trim()) {
         return;
     }
-    setTimeout(function () {
-        timerFunction(inputDate, id)
-    }, 1000);
+    else {
+        $.ajax({
+            url: "timer.jsp",
+            data: {
+                timeDuration: dateAndTime,
+                id: id,
+            },
+            method: "POST"
+        }).done(function () {
+        }).fail(function () {
+        });
+    }
+    i++;
+    getUserTimeData(dateAndTime ,id);
 }
+var setUpReminderButton = function (id) {
+    //console.log(" setUpReminderButton ");
+    var idAfterSplit = id.split('-').pop();
+    $(id).click(function () {
+        $('.remainderButton').css("pointer-events","none");
+        var setTimerPanel =  $("#setTimerPanel");
+        setTimerPanel.insertAfter(this);
+        setTimerPanel.slideToggle("slow");
+        $('.datetimepicker').datetimepicker({});
+        $("#cancelButton").click(function () {
+            reminderCancelFunction();
+        })
+        $("#timeSetButton").click(function () {
+            reminderSetFunction(idAfterSplit);
+            })
+    })
+}
+var getUserTimeData = function(dateAndTime , id){
+    var userEnteredDate = moment(dateAndTime , "MM-DD-YYYY HH:mm a A").toDate();
+    var presentDate = new Date();
+    var differenceTravel = userEnteredDate.getTime()-presentDate.getTime();
+    timerFunction(parseInt(differenceTravel) , id)
+    }
+var timerFunction = function (differenceTravel , id ) {
+    var reminderIcon = $("#remainderButton-" + id);
+    $('#listItemId-' +id).last().append("<span id='displayTimeId-" +id + "' style='cursor: pointer'></span>")
+    var displaytime = $("#displayTimeId-" + id);
+    if (differenceTravel <= 0) {
+        alert("your reminder time should be greater than present time");
+        return;
+    }
+    //clearInterval(timer);
+    timer = setInterval(function () {
+        reminderIcon.css("display", "none");
+        displaytime.css("display" , "block");
+        var lengthOfTime =moment.duration(differenceTravel ,"milliseconds" );
+        differenceTravel = differenceTravel - 1000;
+        if(lengthOfTime.minutes() >= 5){
+            displaytime.text(lengthOfTime.humanize() +" left");
+        }
+        else if(lengthOfTime.minutes() < 5 && lengthOfTime.minutes() < 1){
+            displaytime.text(lengthOfTime.minutes() + ":" + lengthOfTime.seconds() + " left");
+        }
+        else if(lengthOfTime.minutes() == 0 && lengthOfTime.seconds() > 1) {
+            displaytime.text(lengthOfTime.seconds() + " left");
+        }
+         if (lengthOfTime.milliseconds() <= 0) {
+            clearInterval(timer);
+             reminderIcon.css("display", "block");
+             displaytime.css("display", "none");
+             bootbox.alert({
+                title: "Reminder",
+                message: "item name : " + $('#item-' + id).text(),
+            });
+        }
+    }, 1000);
+};

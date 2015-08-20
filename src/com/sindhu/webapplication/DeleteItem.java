@@ -7,7 +7,7 @@ public class DeleteItem {
     public static void deleteItem(int id , String username) {
         try {
             String delete = "DELETE from To_Do_Lists WHERE id = ? AND username = ?";
-            Connection connection = Database.getConnection();
+            Connection connection = DatabaseV2.getConnection();
             if (connection == null) {
                 return;
             }

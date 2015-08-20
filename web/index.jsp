@@ -8,7 +8,8 @@
     <%if(session.getAttribute("username") != null){
     response.sendRedirect("toDoList.jsp");
     }%>
-    <%
+
+        <%
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         if(Users.login(username , password)) {

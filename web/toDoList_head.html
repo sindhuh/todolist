@@ -1,0 +1,40 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>To Do List</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link href="css/ToDoListStyleSheet.css" rel="stylesheet">
+</head>
+<body>
+<script type="text/javascript" src="js/jquery-2.1.4.js"></script>
+<script type="text/javascript" src="js/moment.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="js/reminder.js"></script>
+<script type="text/javascript" src="js/updateItem.js"></script>
+<script type="text/javascript" src="js/deleteItem.js"></script>
+<script type="text/javascript" src="js/mouseEvents.js"></script><script type="text/javascript" src="js/bootbox.min.js"></script>
+
+<nav class="navbar navbar-inverse ">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand">Welcome <%=session.getAttribute("username")%>! here is your to do list.
+            </div>
+        </div>
+        <form class="nav navbar-nav navbar-right navbar-form">
+            <div class="form-group">
+                <a href="logOut.jsp" id="" class="btn  btn-primary">Log out</a>
+            </div>
+        </form>
+    </div>
+</nav>
+<div class="container">
