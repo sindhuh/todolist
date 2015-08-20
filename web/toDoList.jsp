@@ -1,6 +1,6 @@
-<%@ page import="java.util.List" %>
-<%@ page import="com.sindhu.webapplication.ToDoList" %>
 <%@ page import="com.sindhu.webapplication.ToDoItem" %>
+<%@ page import="com.sindhu.webapplication.ToDoList" %>
+<%@ page import="java.util.List" %>
 <%@include file="toDoList_head.html" %>
 <%
     if (session.getAttribute("username") == null || session.getAttribute("username") == "") {
@@ -20,41 +20,43 @@
 
 <div class="toDoListContainerOuter">
     <div id="listContainer" class="toDoListContainerInner">
-        <div id="listBody" class="toDoListStyle">
+        <div id="addItemFailAlert" class="alert alert-danger" style="display: none">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Sorry!</strong>Please try again.
+        </div>
+        <div id="listBody" class="toDoList">
             <%
                 for (ToDoItem item : toDoListItems) {
             %>
-            <div id="listItemId-<%= item.ID %>" class="toDoListDataStyle">
+            <div id="listItemId-<%= item.ID %>" class="toDoListItem">
                 <span id="item-<%= item.ID %>" class="itemStyle " contenteditable="true"><%= item.message %>
                 </span>
                 <span class="checkboxStyle checkbox-primary" id="checkboxId-<%= item.ID %>"><input class="checkboxSize"
                                                                                                    type="checkbox"/></span>
-                <%if (item.timer.equals("")) {%>
-                <span id="remainderButton-<%= item.ID %>" class="remainderButtonStyle"
+                <%if ((item.timer).trim().isEmpty()) {%>
+                <span id="remainderButton-<%= item.ID %>" class="remainderButton"
                       value="Remainder"><span class="glyphicon glyphicon-time"></span></span>
                 <% } else {%>
                 <span class="timeLeftMessageStyle" id="displayTimeId-<%= item.ID %>" style="cursor: pointer"></span>
-                <script> getUserTimeData("<%=item.timer %>", <%= item.ID %>);
-                </script>
                 <% } %>
             </div>
             <%
                 }
             %>
         </div>
-        <div id="panel" class="panelSlide">
-            <div class="timerStyle ">
+        <div id="setTimerPanel" class="panelSlide">
+            <div class="timerStyle">
                 <div class="col-sm-5 input-group date datetimepicker">
                     <input id="dateId" type="text" class="form-control"/>
                     <div class="input-group-addon glyphicon glyphicon-calendar"></div>
                 </div>
             </div>
             <div class="timerButtons ">
-                <div id="cancelButton" class="col-sm-2 btn btn-default">Cancel</div>
-                <div id="timeSetButton" style="margin-left: 2%" class="col-sm-2 btn btn-default">Done</div>
+                <div id="cancelButton" class="col-sm-2 btn btn-link">Cancel</div>
+                <div id="timeSetButton" style="margin-left: 2%" class="col-sm-2 btn btn-primary">Done</div>
             </div>
         </div>
-        <div id="resetPanel" class="panelSlide">
+        <div id="updateTimerPanel" class="panelSlide">
             <div id="message"></div>
             <div class="col-sm-5 input-group date datetimepicker">
                 <input id="dateI" type="text" class="form-control"/>
@@ -72,29 +74,42 @@
 </div>
 <script>
     $(function () {
-        $('.datetimepicker').datetimepicker({});
-        var timeLeftMessageFunction = function (id) {
+        var setupTimeLeftButton = function (id) {
             $(id).click(function () {
-                var resetPanel = $("#resetPanel");
+                var resetPanel = $("#updateTimerPanel");
                 resetPanel.insertAfter(this);
                 var timeLeft = $(this).html();
-                $("#message").html("time remaining: " +timeLeft.split(":").pop());
+                $("#message").html("time remaining: " + timeLeft.split(":").pop());
                 resetPanel.slideToggle();
                 $("#editButton").click(function () {
-                })
+                    resetPanel.css("display", "none");
+                    var element = $("#listItemId-" + id.split("-").pop());
+                    var setTimerPanel = $("#setTimerPanel");
+                    setTimerPanel.insertAfter(element);
+                    setTimerPanel.slideDown();
+                    $("#cancelButton").click(function () {
+                        reminderCancelFunction();
+                    });
+                    $("#timeSetButton").click(function () {
+                        reminderSetFunction(id.split("-").pop());
+                    });
+                });
             })
         };
         $(".timeLeftMessageStyle").each(function () {
             var idOfTimeLeftMessage = '#' + this.id;
-            timeLeftMessageFunction(idOfTimeLeftMessage);
+           <% for (ToDoItem item : toDoListItems) { %>
+            if(this.id.split("-").pop() == <%= item.ID %> ) {
+                getUserTimeData("<%= item.timer%>" , <%= item.ID%>);
+            }
+            <% } %>
+            setupTimeLeftButton(idOfTimeLeftMessage);
         });
-        $(".remainderButtonStyle").each(function () {
+        $(".remainderButton").each(function () {
             var idOfRemainder = '#' + this.id;
-            reminderFunction(idOfRemainder);
+            setUpReminderButton(idOfRemainder);
         });
         var listEmpty = <%=isListEmpty%>;
-        var idOfLastItem = 0;
-        $(".checkboxStyle").css('visibility', 'hidden');
         var itemInputNode = $('#todoItemName');
         itemInputNode.keypress(function (e) {
             if (e.which == 13) {
@@ -110,36 +125,36 @@
                     },
                     method: 'POST'
                 }).done(function (data) {
+                    var idOfLastItem;
                     idOfLastItem = parseInt(data);
+                    var insertRow = "<div class='toDoListDataStyle' id='listItemId-" + idOfLastItem + "'><span contenteditable='true' id='item-" + idOfLastItem + "' class ='itemStyle'>" + itemName + " </span><span class='checkboxStyle' id='checkboxId-" + idOfLastItem + "' ><input class='checkboxSize' type='checkbox'/></span><span id='remainderButton-" + idOfLastItem + "' class='button btn btn-default btn-sm remainderButton'>Reminder</span></div>";
                     if (listEmpty) {
                         listEmpty = false;
-                        $('#listBody').prepend("<div class='toDoListDataStyle' id='listItemId-" + idOfLastItem + "'><span contenteditable='true' id='item-" + idOfLastItem + "' class ='itemStyle'>" + itemName + " </span><span class='checkboxStyle' id='checkboxId-" + idOfLastItem + "' ><input type='checkbox'/></span><span id='remainderButton-" + idOfLastItem + "' class='button btn btn-default btn-sm remainderButtonStyle'>Reminder</span></div>");
-                        $('#checkboxId-' + idOfLastItem).css('visibility', 'hidden');
+                        $('#listBody').prepend(insertRow);
                     } else {
-                        $('#listBody').last().append("<div class='toDoListDataStyle' id='listItemId-" + idOfLastItem + "'> <span contenteditable='true' id='item-" + idOfLastItem + "' class ='itemStyle'>" + itemName + " </span><span class='checkboxStyle' id='checkboxId-" + idOfLastItem + "' ><input type='checkbox'/></span><span id='remainderButton-" + idOfLastItem + "' class='button btn btn-default btn-sm remainderButtonStyle'>Reminder</span></div>");
-                        $('#checkboxId-' + idOfLastItem).css('visibility', 'hidden');
+                        $('#listBody').last().append(insertRow);
                     }
                     setUpClickListeners("#listItemId-" + idOfLastItem);
                     updateItemFunction("#item-" + idOfLastItem);
-                    reminderFunction("#remainderButton-" + idOfLastItem);
+                    setUpReminderButton("#remainderButton-" + idOfLastItem);
+                    itemInputNode.val("");
                 }).fail(function () {
+                    $('#addItemFailAlert').css("display","block");
                 });
-                itemInputNode.val("");
             }
         });
         var setUpClickListeners = function (Id) {
             mouseEventFunction(Id);
-            deleteFunction(Id);
-            if (($('#listBody').children().length) == 0) {
-                listEmpty = true;
-                $('#emptyListMessage').css("display", "block");
-            }
+            deleteFunction(Id , listEmpty);
         }
         $('.itemStyle').each(function () {
             updateItemFunction('#' + this.id);
         });
-        $('.toDoListDataStyle').each(function () {
+        $('.toDoListItem').each(function () {
             setUpClickListeners('#' + this.id);
+        });
+        $('.datetimepicker').datetimepicker({
+            'sideBySide' : true
         });
     });
 </script>

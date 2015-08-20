@@ -6,8 +6,7 @@
   if(session.getAttribute("username") == null){
     return;
   }
-  ToDoList.addItem(String.valueOf(session.getAttribute("username")), toDoItem);
-  List<Long> toDoItemsIds = ToDoList.toDoListIds();
-  long lastItemIdOfList = toDoItemsIds.get(toDoItemsIds.size() - 1);
-  response.getWriter().write(String.valueOf(lastItemIdOfList));
+  ToDoList.addToDoItem(String.valueOf(session.getAttribute("username")), toDoItem);
+  long last_id = ToDoList.toDoListLastId();
+  response.getWriter().write(String.valueOf(last_id));
 %>

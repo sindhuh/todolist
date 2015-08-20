@@ -1,4 +1,3 @@
-
 body{
     overflow-y: hidden;
 }
@@ -41,14 +40,11 @@ body{
     width : 100%;
     height: 70%;
 }
-.toDoListStyle {
-    overflow-y : hidden;
+.toDoList {
     margin: auto;
 }
-.toDoListDataStyle {
-    overflow: auto;
+.toDoListItem {
     padding: 5px;
-    left: 0;
 }
 .dateCalender{
     position: relative;
@@ -86,28 +82,32 @@ body{
     float:left
 }
 .checkboxStyle{
+    visibility: hidden;
     width : 10%;
 }
 .checkboxSize{
-    cursor: pointer;
-    width: 18px;
-    height : 18px;
+   cursor: pointer;
+    width: 22px;
+    height : 22px;
 }
-.remainderButtonStyle {
+
+.remainderButton {
     cursor: pointer;
     font-size: 20px;
     margin-left: 5%;
 }
+
 .panelSlide{
-    padding: 5px;
     text-align: center;
-    border: solid 1px;
     display : none;
+    position: relative;
 }
+
 .timerStyle {
     padding: 5px;
     margin-left: 40%;
 }
+
 .alertMessage {
     display: none;
 }
@@ -118,6 +118,6 @@ body{
 }
 .timeLeftMessageStyle{
     float: right;
-    margin-right: 30%;
-  font-style: oblique;
+    margin-right: 35%;
+    font-style: normal;
 }
